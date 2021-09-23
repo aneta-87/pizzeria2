@@ -162,7 +162,7 @@
         thisProduct.processOrder();
       });
 
-      for (let input of thisProduct.formInputs) {
+      for (let input of thisProduct.dom.formInputs) {
         input.addEventListener('change', function () {
           thisProduct.processOrder();
         });
@@ -328,13 +328,14 @@
     }
     announce() {
       const thisWidget = this;
-      const event = new Event('updated');
-      /*const event = new CustomEvent('updated'),{
+      /*const event = new Event('updated');*/
+      const event = new CustomEvent('updated', {
         bubbles: true
-      });*/
+      });
       thisWidget.element.dispatchEvent(event);
     }
   }
+
   class Cart {
     constructor(element) {
       const thisCart = this;
@@ -361,42 +362,50 @@
       thisCart.dom.toggleTrigger.addEventListener('click', function () { //dzięki temu koszyk zwija się i rozwija
         thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
       });
-      /*thisCart.dom.productList.addEventListener('updated', function () {
-        thisCart.update();
-      });*/ //IN Progress zadanie z modułu 9.5
+      thisCart.dom.productList.addEventListener('updated', function () {
+        thisCart.update(); // nasluchujemy listę produktów, w której umieszczamy produkty
+      });
     }
     add(menuProduct) {
       const thisCart = this;
-      /*console.log('adding product', menuProduct);*/
+      console.log('adding product', menuProduct);
       /* generate  HTML based on template*/
       const generatedHTML = templates.cartProduct(menuProduct);
       /* create element DOM using utils.createElementFromHTML */
       const generatedDOM = utils.createDOMFromHTML(generatedHTML);
-      /*console.log('generatedDOM: ', generatedDOM);*/
+      console.log('generatedDOM: ', generatedDOM);
       /* add element DOM to thisCart*/
       thisCart.dom.productList.appendChild(generatedDOM);
       thisCart.products.push(new CartProduct(menuProduct, generatedDOM)); //dzieki temu mamy podsumowanie zamowienia w konsoli i stały dostęp do instancji wszystkich produktów
-      /*console.log('thisCart.products', thisCart.products);*/
+      console.log('thisCart.products', thisCart.products);
       thisCart.update();
     }
-    //IN PROGRESS moduł 9.5
-    /*update() { //methoda do sumowania koszyka
+
+    update() { //methoda do sumowania koszyka
       const thisCart = this;
-      const deliveryFee = settings.cart.defaultDeliveryFee;
-      thisCart.totalNumber = 0;
-      thisCart.subtotalPrice = 0;
-      thisCart.totalPrice = 0;
-      for (let product of thisCart.products) {
-        thisCart.totalNumber += product.amount; // zwiększa totalNr o liczbę sztuk danego produktu
-        thisCart.subtotalPrice += product.price; //  zwiększa subTotalPrice o jego cenę całkowitą price
+      thisCart.totalNumber = 0; //odpowiada całościowej liczbie sztuk
+      thisCart.subtotalPrice = 0; //zsumowana cena za wszystko bez dostawy
+      thisCart.totalPrice = 0; //cena z kosztem dostawy
+      let deliveryFee = settings.cart.defaultDeliveryFee;
+      if (thisCart.products.length === 0) {
+        deliveryFee = 0;
       }
-      if (thisCart.totalNumber = 0) {
-        thisCart.totalPrice = thisCart.subtotalPrice;
-      } else {
-        thisCart.totalPrice = thisCart.subtotalPrice += deliveryFee;
+      for (const product of thisCart.products) {
+        thisCart.totalNumber += product.amount;
+        thisCart.subtotalPrice += product.price;
+      }
+      thisCart.totalNumber == 0 ? thisCart.deliveryFee = 0 : thisCart.deliveryFee = settings.cart.defaultDeliveryFee;
+      thisCart.totalPrice = thisCart.subtotalPrice + thisCart.deliveryFee;
+
+      thisCart.dom.totalNumber.innerHTML = thisCart.totalNumber;//odpowiada całościowej liczbie sztuk
+      thisCart.dom.subtotalPrice.innerHTML = thisCart.subtotalPrice; //zsumowana cena za wszystko bez dostawy
+      thisCart.dom.deliveryFee.innerHTML = deliveryFee; //koszt dostawy
+      thisCart.dom.totalPrice.innerHTML = thisCart.totalPrice; // cena całkowita z kosztem dostawy
+      for (const domTotalPrice of thisCart.dom.totalPrice) {
+        domTotalPrice.innerHTML = thisCart.totalPrice;
       }
     }
-  }*/
+  }
 
   class CartProduct {
     constructor(menuProduct, element) {
@@ -440,7 +449,7 @@
     initMenu: function () {
       /*const thisApp = this;
       console.log('thisApp.data:', thisApp.data);
- 
+   
       const testProduct = new Product();
       console.log('testProduct:', testProduct);
     }, */
