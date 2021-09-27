@@ -365,6 +365,9 @@
       thisCart.dom.productList.addEventListener('updated', function () {
         thisCart.update(); // nasluchujemy listę produktów, w której umieszczamy produkty
       });
+      thisCart.dom.productList.addEventListener('remove', function (event) {
+        thisCart.remove(event.detail.cartProduct); // nasluchujemy przycisk remove
+      });
     }
     add(menuProduct) {
       const thisCart = this;
@@ -405,6 +408,15 @@
         domTotalPrice.innerHTML = thisCart.totalPrice;
       }
     }
+    remove(removeProduct) { //metoda usuwa reprezentacje prod. z HTML, informacje o produkcie z tablicy i wywołuje metode update
+      const thisCart = this;
+
+      const indexOfProduct = thisCart.products.indexOf(CartProduct);
+      thisCart.products.splice(indexOfProduct, 1);
+
+      removeProduct.dom.wrapper.remove();
+      thisCart.update();
+    }
   }
 
   class CartProduct {
@@ -421,6 +433,7 @@
 
       thisCartProduct.getElements(element);
       thisCartProduct.initAmountWidget();
+      thisCartProduct.initActions();
       /*console.log('thisCartProduct: ', thisCartProduct);*/
     }
     getElements(element) {
@@ -442,6 +455,29 @@
         thisCartProduct.amount = thisCartProduct.amountWidget.value;
         thisCartProduct.price = thisCartProduct.amount * thisCartProduct.priceSingle;
         thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
+      });
+    }
+    remove() {
+      const thisCartProduct = this;
+
+      const event = new CustomEvent('remove', {
+        bubbles: true,
+        detail: {
+          cartProduct: thisCartProduct,
+        },
+      });
+      thisCartProduct.dom.wrapper.dispatchEvent(event);
+    }
+
+    initActions() {
+      const thisCartProduct = this;
+      thisCartProduct.dom.edit.addEventListener('click', function (event) {
+        event.preventDefault();
+      });
+      thisCartProduct.dom.remove.addEventListener('click', function (event) {
+        event.preventDefault();
+        thisCartProduct.remove();
+        console.log('thisCartProduct.dom.remove: ', thisCartProduct.dom.remove);
       });
     }
   }
