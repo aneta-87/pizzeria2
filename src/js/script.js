@@ -76,6 +76,11 @@
     cart: {
       defaultDeliveryFee: 20,
     },
+    db: {
+      url: '//localhost:3131',
+      products: 'products',
+      orders: 'orders',
+    },
     // CODE ADDED END
   };
   const templates = {
@@ -238,7 +243,7 @@
       /*console.log('new price: ', price);*/
 
     }
-    prepareCartProduct() {
+    prepareCartProduct() {//dzieki tej metodzie generujemy podsumowanie produktow w formie małego obiektu
       const thisProduct = this;
       const productSummary = {
         id: thisProduct.id,
@@ -343,7 +348,6 @@
       thisCart.products = [];
       thisCart.getElements(element);
       thisCart.initActions();
-
       /*console.log('new Cart: ', thisCart);*/
     }
     getElements(element) {
@@ -356,6 +360,9 @@
       thisCart.dom.subtotalPrice = element.querySelector(select.cart.subtotalPrice);
       thisCart.dom.totalPrice = element.querySelectorAll(select.cart.totalPrice);
       thisCart.dom.totalNumber = element.querySelector(select.cart.totalNumber);
+      thisCart.dom.form = element.querySelector(select.cart.form); //9.9. referencja do elementu formularza
+      thisCart.dom.phone = element.querySelector(select.cart.phone); // 9.9. referencja do imputu phone
+      thisCart.dom.address = element.querySelector(select.cart.address); //9.9. referencja do imputu address
     }
     initActions() {
       const thisCart = this;
@@ -367,6 +374,10 @@
       });
       thisCart.dom.productList.addEventListener('remove', function (event) {
         thisCart.remove(event.detail.cartProduct); // nasluchujemy przycisk remove
+      });
+      thisCart.dom.form.addEventListener('submit', function (event) { //9.9. nasłuchiwacz do formularza. Nasłuchuje event submit
+        event.preventDefault(); //9.9 funkcja blokująca domyślne zachowanie formularza. Przycisk ORDER nie działa teraz
+        thisCart.sendOrder(); //9.9 wywołanie metody, która kompletuje info o zamówieniu i poźniejsza wysyłka na serwer
       });
     }
     add(menuProduct) {
@@ -390,6 +401,7 @@
       thisCart.subtotalPrice = 0; //zsumowana cena za wszystko bez dostawy
       thisCart.totalPrice = 0; //cena z kosztem dostawy
       let deliveryFee = settings.cart.defaultDeliveryFee;
+
       if (thisCart.products.length === 0) {
         deliveryFee = 0;
       }
@@ -416,6 +428,37 @@
 
       removeProduct.dom.wrapper.remove();
       thisCart.update();
+    }
+    sendOrder() { //9.9 metoda kompletuje info o zamówieniu i poźniejsza wysyłka na serwer
+      const thisCart = this;
+      const url = settings.db.url + '/' + settings.db.orders;
+
+      const payload = {};
+      payload.address = thisCart.dom.address; //adres klienta wpisany w koszyku;
+      payload.phone = thisCart.dom.phone;//numer telefonu wpisany w koszyku;
+      payload.totalPrice = thisCart.dom.totalPrice;//całkowita cena za zamówienie;
+      payload.subtotalPrice = thisCart.dom.subtotalPrice; //cena całkowita - koszt dostawy;
+      payload.totalNumber = thisCart.dom.totalNumber; //całkowita liczba sztuk;
+      payload.deliveryFee = thisCart.dom.deliveryFee; //koszt dostawy;
+      payload.products = []; //tablica obecnych w koszyku produktów
+      console.log('payload: ', payload);
+      for (let prod of thisCart.products) {
+        payload.products.push(prod.getData());
+      }
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      };
+
+      fetch(url, options)
+        .then(function (response) {
+          return response.json();
+        }).then(function (parsedResponse) {
+          console.log('parsedResponse', parsedResponse);
+        });
     }
   }
 
@@ -480,6 +523,18 @@
         console.log('thisCartProduct.dom.remove: ', thisCartProduct.dom.remove);
       });
     }
+    getData() { //wzięłąm właściwości z całej instancji thisCartProduct, a wzorowałam się na metodzie prepareCartProduct
+      const thisCartProduct = this;
+      const productData = {
+        id: thisCartProduct.id,
+        name: thisCartProduct.name,
+        amount: thisCartProduct.amount,
+        priceSingle: thisCartProduct.priceSingle,
+        price: thisCartProduct.price,
+        params: thisCartProduct.params,
+      };
+      return productData;
+    }
   }
   const app = { //deklaracja obiektu app
     initMenu: function () {
@@ -493,13 +548,29 @@
       /*console.log('thisApp.data:', thisApp.data);*/
 
       for (let productData in thisApp.data.products) {
-        new Product(productData, thisApp.data.products[productData]);
+        /*new Product(productData, thisApp.data.products[productData]);*/ //zamieniam na poniższą właściwość id
+        new Product(thisApp.data.products[productData].id, thisApp.data.products[productData]);
       }
     },
     initData: function () {
       const thisApp = this;
-      thisApp.data = dataSource;
+      thisApp.data = {}; //zastąpiłam [dataSource] pustym obiektem
+      const url = settings.db.url + '/' + settings.db.products;
+
+      fetch(url)
+        .then(function (RawResponse) {
+          return RawResponse.json();
+        })
+        .then(function (parsedResponse) {
+          console.log('parsedResponse', parsedResponse);
+          /* save parsedResponse as thisApp.data.products */
+          thisApp.data.products = parsedResponse;
+          /* execute initMenu method */
+          thisApp.initMenu();
+        });
+      console.log('thisApp.data', JSON.stringify(thisApp.data));
     },
+
     initCart: function () {
       const thisApp = this;
       const cartElem = document.querySelector(select.containerOf.cart);
@@ -515,7 +586,7 @@
       console.log('templates:', templates);*/
 
       thisApp.initData();
-      thisApp.initMenu();
+      /*thisApp.initMenu();*/ //AJAX//kasuje wywołanie metody
       thisApp.initCart();
     },
   };
