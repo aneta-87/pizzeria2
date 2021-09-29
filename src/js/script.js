@@ -436,10 +436,10 @@
       const payload = {}; //obiekt z danymi, które chcemy wysłać do serwera
       payload.address = thisCart.dom.address.value; //adres klienta wpisany w koszyku;
       payload.phone = thisCart.dom.phone.value;//numer telefonu wpisany w koszyku;
-      payload.totalPrice = thisCart.dom.totalPrice;//całkowita cena za zamówienie;
-      payload.subtotalPrice = thisCart.dom.subtotalPrice; //cena całkowita - koszt dostawy;
-      payload.totalNumber = thisCart.dom.totalNumber; //całkowita liczba sztuk;
-      payload.deliveryFee = thisCart.dom.deliveryFee; //koszt dostawy;
+      payload.totalPrice = thisCart.dom.totalPrice.innerHTML;//całkowita cena za zamówienie;
+      payload.subtotalPrice = thisCart.dom.subtotalPrice.innerHTML; //cena całkowita - koszt dostawy;
+      payload.totalNumber = thisCart.dom.totalNumber.innerHTML; //całkowita liczba sztuk;
+      payload.deliveryFee = thisCart.dom.deliveryFee.innerHTML; //koszt dostawy;
       payload.products = []; //tablica obecnych w koszyku produktów
       console.log('payload: ', payload);
       for (let prod of thisCart.products) {
@@ -586,7 +586,7 @@
       console.log('templates:', templates);*/
 
       thisApp.initData();
-      /*thisApp.initMenu();*/ //AJAX//kasuje wywołanie metody
+      /*thisApp.initMenu();*/
       thisApp.initCart();
     },
   };
