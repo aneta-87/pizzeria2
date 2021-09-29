@@ -431,11 +431,11 @@
     }
     sendOrder() { //9.9 metoda kompletuje info o zamówieniu i poźniejsza wysyłka na serwer
       const thisCart = this;
-      const url = settings.db.url + '/' + settings.db.orders;
+      const url = settings.db.url + '/' + settings.db.orders; //adres endpointu z którym chcemy się połączyć
 
-      const payload = {};
-      payload.address = thisCart.dom.address; //adres klienta wpisany w koszyku;
-      payload.phone = thisCart.dom.phone;//numer telefonu wpisany w koszyku;
+      const payload = {}; //obiekt z danymi, które chcemy wysłać do serwera
+      payload.address = thisCart.dom.address.value; //adres klienta wpisany w koszyku;
+      payload.phone = thisCart.dom.phone.value;//numer telefonu wpisany w koszyku;
       payload.totalPrice = thisCart.dom.totalPrice;//całkowita cena za zamówienie;
       payload.subtotalPrice = thisCart.dom.subtotalPrice; //cena całkowita - koszt dostawy;
       payload.totalNumber = thisCart.dom.totalNumber; //całkowita liczba sztuk;
