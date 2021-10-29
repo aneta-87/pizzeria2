@@ -2,8 +2,6 @@ import {settings, select, classNames, templates} from '../settings.js';
 import utils from '../utils.js';
 import CartProduct from './CartProduct.js';
 
-
-
 class Cart {
   constructor(element) {
     const thisCart = this;
@@ -36,7 +34,7 @@ class Cart {
       thisCart.update(); // nasluchujemy listę produktów, w której umieszczamy produkty
     });
     thisCart.dom.productList.addEventListener('remove', function (event) {
-      thisCart.remove(event.detail.cartProduct); // nasluchujemy przycisk remove
+      thisCart.remove(event.detail.cartProduct.dom.wrapper); // nasluchujemy przycisk remove
     });
     thisCart.dom.form.addEventListener('submit', function (event) { //9.9. nasłuchiwacz do formularza. Nasłuchuje event submit
       event.preventDefault(); //9.9 funkcja blokująca domyślne zachowanie formularza. Przycisk ORDER nie działa teraz
