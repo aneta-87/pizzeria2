@@ -1,4 +1,4 @@
-import {select,templates, classNames} from '../settings.js';
+import { select, templates, classNames } from '../settings.js';
 import utils from '../utils.js';
 import AmountWidget from './AmountWidget.js';
 
@@ -16,22 +16,19 @@ class Product {
     thisProduct.initAmountWidget();
     thisProduct.processOrder();
     thisProduct.prepareCartProduct();
+    thisProduct.prepareCartProductParams()
 
     /*console.log('new Product:', thisProduct);*/
   }
   renderInMenu() {
     const thisProduct = this;
-
     /* generate  HTML based on template*/
     const generatedHTML = templates.menuProduct(thisProduct.data);
-
     /* create element using utils.createElementFromHTML */
     thisProduct.element = utils.createDOMFromHTML(generatedHTML);
-
     /* find menu container */
     const menuContainer = document.querySelector(select.containerOf.menu);
     /*console.log('menuContainer:', menuContainer);*/
-
     /* add element to menu*/
     menuContainer.appendChild(thisProduct.element);
   }
@@ -64,12 +61,13 @@ class Product {
       const activeProduct = document.querySelector(select.all.menuProductsActive);
 
       /* if there is active product and it's not thisProduct.element, remove class active from it */
-      if (activeProduct && activeProduct != thisProduct.element) {
+      if (activeProduct && activeProduct !== thisProduct.element) {
         activeProduct.classList.remove('active');
         /*console.log('remove class active');*/
+      } else {
+        /* toggle active class on thisProduct.element */
+        thisProduct.element.classList.toggle(classNames.menuProduct.wrapperActive);
       }
-      /* toggle active class on thisProduct.element */
-      thisProduct.element.classList.toggle(classNames.menuProduct.wrapperActive);
     });
   }
   initOrderForm() { /*odpowiedzialna za dodanie listenerów eventów do formularza, jego kontrolek, oraz guzika dodania do koszyka.*/
@@ -171,14 +169,14 @@ class Product {
   }
   addToCart() {
     const thisProduct = this;
-    thisProduct.name = thisProduct.data.name; //dodałam ta linie 15.10.2021
-    thisProduct.amount = thisProduct.amountWidget.value; //dodałam ta linie 15.10.2021
+    thisProduct.name = thisProduct.data.name;
+    thisProduct.amount = thisProduct.amountWidget.value;
     //app.cart.add(thisProduct.prepareCartProduct());
-    //app.cart.add(thisProduct); //DODALAM 15.10.2021
+    //app.cart.add(thisProduct); 
 
-    const event = new CustomEvent ('add-to-Cart', { //tworze event customowy
+    const event = new CustomEvent('add-to-Cart', { //tworze event customowy
       bubbles: true, //chce by event bąbelkował tzn. byl przekazywany do rodzica, rodzica rodzica itd.
-      detail: { 
+      detail: {
         product: thisProduct, //chce by pod kluczem Product znajdował sięprodukt, który został dodany do koszyka
       },
     });
