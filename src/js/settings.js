@@ -110,8 +110,6 @@ export const settings = {
     products: 'products',
     orders: 'orders',
     url: '//localhost:3131',
-    product: 'product',
-    order: 'order',
     booking: 'booking',
     event: 'event',
     dateStartParamKey: 'date_gte',
