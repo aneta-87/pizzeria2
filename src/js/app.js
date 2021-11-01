@@ -1,6 +1,7 @@
 import { settings, select, classNames } from './settings.js';
 import Product from './components/Product.js';
 import Cart from './components/Cart.js';
+import Booking from './components/Booking.js';
 
 const app = { //słuzy organizacji całej aplikacji deklaracja obiektu app
   initPages: function () { //metoda initPages jest uruchamiana w momencie odswiezenia strony
@@ -113,8 +114,13 @@ const app = { //słuzy organizacji całej aplikacji deklaracja obiektu app
     thisApp.initData();
     /*thisApp.initMenu();*/
     thisApp.initCart();
+    thisApp.initBooking();
 
   },
-
+  initBooking: function () {
+    const thisApp = this;
+    thisApp.wrapper = document.querySelector(select.containerOf.booking);
+    thisApp.bookingWidget = new Booking(thisApp.wrapper);
+  },
 };
 app.init();
