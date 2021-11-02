@@ -16,7 +16,7 @@ class Product {
     thisProduct.initAmountWidget();
     thisProduct.processOrder();
     //thisProduct.prepareCartProduct()
-    thisProduct.prepareCartProductParams();
+    //thisProduct.prepareCartProductParams();
 
     /*console.log('new Product:', thisProduct);*/
   }
