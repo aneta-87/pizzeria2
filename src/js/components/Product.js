@@ -15,7 +15,7 @@ class Product {
     thisProduct.initOrderForm();
     thisProduct.initAmountWidget();
     thisProduct.processOrder();
-    thisProduct.prepareCartProduct();
+    //thisProduct.prepareCartProduct()
     thisProduct.prepareCartProductParams();
 
     /*console.log('new Product:', thisProduct);*/
@@ -169,15 +169,15 @@ class Product {
   }
   addToCart() {
     const thisProduct = this;
-    thisProduct.name = thisProduct.data.name;
-    thisProduct.amount = thisProduct.amountWidget.value;
+    //thisProduct.name = thisProduct.data.name;
+    //thisProduct.amount = thisProduct.amountWidget.value;
     //app.cart.add(thisProduct.prepareCartProduct());
     //app.cart.add(thisProduct); 
 
     const event = new CustomEvent('add-to-Cart', { //tworze event customowy
       bubbles: true, //chce by event bąbelkował tzn. byl przekazywany do rodzica, rodzica rodzica itd.
       detail: {
-        product: thisProduct, //chce by pod kluczem Product znajdował sięprodukt, który został dodany do koszyka
+        product: thisProduct.prepareCartProduct(), //chce by pod kluczem Product znajdował sięprodukt, który został dodany do koszyka
       },
     });
     thisProduct.element.dispatchEvent(event);//wywołanie eventu
