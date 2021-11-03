@@ -99,7 +99,7 @@ const app = { //słuzy organizacji całej aplikacji deklaracja obiektu app
 
     thisApp.productList = document.querySelector(select.containerOf.menu);// kod odpowiedzialny za nasluchiwanie stworzonego przez nas Eventu customowy
     thisApp.productList = addEventListener('add-to-cart', function (event) {
-      app.cart.add(event.detail.Product); //nasz event posiada obiekt detail, w ktorym znajduje się właściwość product z product addToCart
+      app.cart.add(event.detail.product); //nasz event posiada obiekt detail, w ktorym znajduje się właściwość product z product addToCart
     });
   },
   init: function () {

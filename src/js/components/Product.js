@@ -174,7 +174,7 @@ class Product {
     //app.cart.add(thisProduct.prepareCartProduct());
     //app.cart.add(thisProduct); 
 
-    const event = new CustomEvent('add-to-Cart', { //tworze event customowy
+    const event = new CustomEvent('add-to-cart', { //tworze event customowy
       bubbles: true, //chce by event bąbelkował tzn. byl przekazywany do rodzica, rodzica rodzica itd.
       detail: {
         product: thisProduct.prepareCartProduct(), //chce by pod kluczem Product znajdował sięprodukt, który został dodany do koszyka
