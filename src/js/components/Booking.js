@@ -1,7 +1,8 @@
-import { select, templates } from '../settings.js';
+import { select, settings, templates } from '../settings.js';
 import AmountWidget from './AmountWidget.js';
 import DatePicker from './DatePicker.js';
 import HourPicker from './HourPicker.js';
+import utils from '../utils.js';
 
 class Booking {
   constructor(element) {
@@ -9,8 +10,63 @@ class Booking {
 
     thisBooking.render(element);
     thisBooking.initWidgets();
+    thisBooking.getData();
   }
 
+  getData() {//metoda pobiera dane z API używając adresów z parametrami filtrującymi wyniki
+    const thisBooking = this;
+
+    const startDateParam = settings.db.dateStartParamKey + '=' + utils.dateToStr(thisBooking.datePicker.minDate);
+    const endDateParam = settings.db.dateEndParamKey + '=' + utils.dateToStr(thisBooking.datePicker.maxDate);
+
+    const params = {
+      booking: [
+        startDateParam,
+        endDateParam,
+      ],
+      eventsCurrent: [
+        settings.db.notRepeatParam,
+        startDateParam,
+        endDateParam,
+      ],
+      eventsRepeat: [
+        settings.db.repeatParam,
+        endDateParam,
+      ],
+    };
+    //console.log('getData params', params);
+
+    const urls = {
+      booking: settings.db.url + '/' + settings.db.booking
+        + '?' + params.booking.join('&'), //pierwsza wlasciwosc booking zawiera adres endpointu API ktory zwroci nam liste rezerwacji
+      eventsCurrent: settings.db.url + '/' + settings.db.event
+        + '?' + params.eventsCurrent.join('&'), // zwraca liste wydarzeń jednorazowych
+      eventsRepeat: settings.db.url + '/' + settings.db.event
+        + '?' + params.eventsRepeat.join('&'), // zwraca liste wydarzen cyklicznych
+    };
+    //console.log('getData urls', urls);
+
+    Promise.all([
+      fetch(urls.booking),
+      fetch(urls.eventsCurrent),
+      fetch(urls.eventsRepeat),
+    ])
+      .then(function (allResponses) {
+        const bookingResponse = allResponses[0];
+        const eventsCurrentResponse = allResponses[1];
+        const eventsRepeatResponse = allResponses[2];
+        return Promise.all([
+          bookingResponse.json(),
+          eventsCurrentResponse .json(),
+          eventsRepeatResponse.json(),
+        ]);
+      })
+      .then(function ([booking, eventsCurrent, eventsRepeat]) {
+        console.log('booking', booking);
+        console.log('eventsCurrent', eventsCurrent);
+        console.log('eventsRepeat', eventsRepeat);
+      });
+  }
   render(element) {
     const thisBooking = this;
 
